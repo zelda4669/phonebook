@@ -1,0 +1,27 @@
+{
+  "name": "phonebook",
+  "version": "0.1.0",
+  "description": "A phonebook application",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zelda4669/phonebook.git"
+  },
+  "author": "NKF",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zelda4669/phonebook/issues"
+  },
+  "homepage": "https://github.com/zelda4669/phonebook#readme",
+  "dependencies": {
+    "express": "^4.18.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.19"
+  }
+}

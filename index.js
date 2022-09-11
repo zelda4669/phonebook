@@ -28,6 +28,13 @@ app.get('/', (req, res) => {
     res.send('Hello world!')
 })
 
+app.get('/info', (req, res) => {
+    let len = persons.length
+    let date = new Date().toString()
+    res.send(`<p>Phonebook has info for ${len} people</p>
+    <p>${date}</p>`)
+})
+
 app.get('/api/persons', (req, res) => {
     res.json(persons)
 })

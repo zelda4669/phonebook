@@ -65,14 +65,21 @@ function getId() {
 
 app.post('/api/persons', (req, res) => {
     const body = req.body
+    const name = persons.filter(p => p.name === body.name)
+
+    console.log(name)
 
     if(!body.name) {
         return res.status(400).json({
-            error: 'content missing'
+            error: 'Please enter a name!'
         })
     } else if(!body.number) {
         return res.status(400).json({
-            error: 'content missing'
+            error: 'Please enter a phone number!'
+        })
+    } else if(name.length > 0) {
+        return res.status(400).json({
+            error: 'This person is already in your phonebook.'
         })
     }
 

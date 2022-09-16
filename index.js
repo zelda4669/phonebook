@@ -31,10 +31,12 @@ app.get('/', (req, res) => {
 })
 
 app.get('/info', (req, res) => {
-    let len = persons.length
     let date = new Date().toString()
-    res.send(`<p>Phonebook has info for ${len} people</p>
+
+    Person.countDocuments({}, function(err, count) {
+        res.send(`<p>Phonebook has info for ${count} people</p>
     <p>${date}</p>`)
+    })
 })
 
 app.get('/api/persons', (req, res) => {
@@ -57,6 +59,7 @@ app.get('/api/persons/:id', (req, res, next) => {
 })
 
 app.delete('/api/persons/:id', (req, res, next) => {
+    console.log(req.params.id)
     Person.findByIdAndRemove(req.params.id)
         .then(result => {
             res.status(204).end()

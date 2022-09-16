@@ -24,8 +24,6 @@ Content-Type: application/json
 
 ###
 
-###
-
 PUT http://localhost:3001/api/persons/6322a3f701be97503778d6f9
 Content-Type: application/json
 

@@ -19,6 +19,9 @@ const App = () => {
       .then(initialPhonebook => {
         setPersons(initialPhonebook)
       })
+      .catch(error => {
+        console.log(error)
+      })
   }, [])
 
   const addPerson = (event) => {
@@ -79,6 +82,15 @@ const App = () => {
           setPersons(persons.concat(returnedPerson))
           setNewName('')
           setNewNumber('')
+        })
+        .catch(error => {
+          setAlert({
+            message: error.response.data,
+            type: 'error'
+          })
+          setTimeout(() => {
+            setAlert({message: null, type: null})
+          }, 5000)
         })
      
     }

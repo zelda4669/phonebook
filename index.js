@@ -1,6 +1,7 @@
 require('dotenv').config()
 const { response } = require('express')
 const express = require('express')
+const bodyParser = require('body-parser')
 const app = express()
 const cors = require('cors')
 const mongoose = require('mongoose')
@@ -8,29 +9,17 @@ const Person = require('./models/person')
 const morgan = require('morgan')
 
 app.use(express.static('build'))
-app.use(express.json())
+app.use(bodyParser.json())
 app.use(cors())
 
 morgan.token('content', function (req, res) {return JSON.stringify(req.body)})
 app.use(morgan(':method :url :status :res[content-length] :response-time ms :content'))
 
-const errorHandler = (err, req, res, next) => {
-    console.error(err.message)
-
-    if(err.name == 'CastError') {
-        return response.status(400).send({error: 'malformed id'})
-    }
-
-    next(err)
-}
-
-app.use(errorHandler)
-
 app.get('/', (req, res) => {
     res.send('Hello world!')
 })
 
-app.get('/info', (req, res) => {
+app.get('/info', (req, res, next) => {
     let date = new Date().toString()
 
     Person.countDocuments({}, function(err, count) {
@@ -43,6 +32,7 @@ app.get('/api/persons', (req, res) => {
     Person.find({}).then(p => {
         res.json(p)
     })
+    .catch(error => (next(error)))
 })
 
 app.get('/api/persons/:id', (req, res, next) => {
@@ -55,7 +45,7 @@ app.get('/api/persons/:id', (req, res, next) => {
             }
             
         })
-        .catch(err => next(err))
+        .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (req, res, next) => {
@@ -67,38 +57,47 @@ app.delete('/api/persons/:id', (req, res, next) => {
         .catch(err => next(err))
 })
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
     const body = req.body
-
-    console.log(body)
-
-    if(body.name === undefined || body.number === undefined) {
-        return res.status(400).json({error: 'content missing'})
-    }
 
     const person = new Person({
         name: body.name,
         number: body.number
     })
 
-    person.save().then(savedPerson => {
-        res.json(savedPerson)
-    })
+    person.save()
+        .then(savedPerson => {
+            res.json(savedPerson)
+        })
+        .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (req, res, next) => {
-    const body = req.body
+    const { name, number } = req.body
 
-    const person = {
-        number: body.number
-    }
-
-    Person.findByIdAndUpdate(req.params.id, person, {new:true})
+    Person.findByIdAndUpdate(
+        req.params.id, 
+        { name, number }, 
+        { new:true, runValidators: true, context: 'query' }
+        )
         .then(updatedPerson => {
             res.json(updatedPerson)
         })
         .catch(error => next(error))
 })
+
+const errorHandler = (error, req, res, next) => {
+    if(error.name === 'CastError') {
+        return res.status(400).send({ error: 'malformed id' })
+    } else if(error.name === 'ValidationError') {
+        console.log(error.message)
+        return res.status(400).send(error.message)
+    }
+
+    next(error)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {

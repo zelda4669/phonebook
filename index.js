@@ -1,10 +1,10 @@
 require('dotenv').config()
-const { response } = require('express')
+
 const express = require('express')
 const bodyParser = require('body-parser')
 const app = express()
 const cors = require('cors')
-const mongoose = require('mongoose')
+// const mongoose = require('mongoose')
 const Person = require('./models/person')
 const morgan = require('morgan')
 
@@ -12,14 +12,14 @@ app.use(express.static('build'))
 app.use(bodyParser.json())
 app.use(cors())
 
-morgan.token('content', function (req, res) {return JSON.stringify(req.body)})
+morgan.token('content', function (req) {return JSON.stringify(req.body)})
 app.use(morgan(':method :url :status :res[content-length] :response-time ms :content'))
 
 app.get('/', (req, res) => {
     res.send('Hello world!')
 })
 
-app.get('/info', (req, res, next) => {
+app.get('/info', (req, res) => {
     let date = new Date().toString()
 
     Person.countDocuments({}, function(err, count) {
@@ -28,11 +28,11 @@ app.get('/info', (req, res, next) => {
     })
 })
 
-app.get('/api/persons', (req, res) => {
+app.get('/api/persons', (req, res, next) => {
     Person.find({}).then(p => {
         res.json(p)
     })
-    .catch(error => (next(error)))
+        .catch(error => (next(error)))
 })
 
 app.get('/api/persons/:id', (req, res, next) => {
@@ -43,7 +43,7 @@ app.get('/api/persons/:id', (req, res, next) => {
             } else {
                 res.status(404).end()
             }
-            
+
         })
         .catch(error => next(error))
 })
@@ -51,7 +51,7 @@ app.get('/api/persons/:id', (req, res, next) => {
 app.delete('/api/persons/:id', (req, res, next) => {
     console.log(req.params.id)
     Person.findByIdAndRemove(req.params.id)
-        .then(result => {
+        .then(() => {
             res.status(204).end()
         })
         .catch(err => next(err))
@@ -76,10 +76,10 @@ app.put('/api/persons/:id', (req, res, next) => {
     const { name, number } = req.body
 
     Person.findByIdAndUpdate(
-        req.params.id, 
-        { name, number }, 
+        req.params.id,
+        { name, number },
         { new:true, runValidators: true, context: 'query' }
-        )
+    )
         .then(updatedPerson => {
             res.json(updatedPerson)
         })

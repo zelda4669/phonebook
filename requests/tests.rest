@@ -18,8 +18,8 @@ POST http://localhost:3001/api/persons
 Content-Type: application/json
 
 {
-    "name": "dkfffjhfdf",
-    "number": "10-22-334455"
+    "name": "dkfffjrhfdf",
+    "number": "10-22334455"
 }
 
 ###
@@ -28,5 +28,5 @@ PUT http://localhost:3001/api/persons/6322a3f701be97503778d6f9
 Content-Type: application/json
 
 {
-    "number": "new number"
+    "number": "11111111"
 }
